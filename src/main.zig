@@ -8,6 +8,11 @@ pub fn main() !void {
     const allocator = std.heap.page_allocator;
     var args = cli.Args.init();
     try cli.initCli(&args, allocator);
+
+    if (args.file_content == null) {
+        return;
+    }
+
     var lexer = Lexer.init(args.file_content.?);
 
     while (true) {

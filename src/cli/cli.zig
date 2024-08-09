@@ -35,7 +35,6 @@ pub fn initCli(args: *Args, allocator: std.mem.Allocator) !void {
     try parseArguments(allocator, args);
 
     if (args.file_path == null) {
-        std.debug.print("No input file provided\n", .{});
         return;
     }
 }
@@ -83,17 +82,27 @@ fn parseArguments(allocator: std.mem.Allocator, args: *Args) !void {
     }
 
     if (matches.getSingleValue("FILE_NAME")) |file_name| {
-        args.file_path = file_name;
-        args.file_content = try getFileContent(args, allocator);
+        if (std.ascii.endsWithIgnoreCase(file_name, ".c")) {
+            args.file_path = file_name;
+            args.file_content = try getFileContent(args, allocator);
+        } else {
+            std.debug.print("{s} is not a valid C program\n", .{file_name});
+        }
     }
 
     return;
 }
 
 fn getFileContent(args: *Args, allocator: std.mem.Allocator) ![]const u8 {
-    const file = try std.fs.cwd().openFile(args.file_path.?, .{});
+    const file = std.fs.cwd().openFile(args.file_path.?, .{}) catch |err| {
+        std.debug.print("Failed to open file: {s}\n", .{args.file_path.?});
+        return err;
+    };
     defer file.close();
 
-    const contents = try file.reader().readAllAlloc(allocator, args.max_file_size);
+    const contents = file.reader().readAllAlloc(allocator, args.max_file_size) catch |err| {
+        std.debug.print("Failed to read file: {s}\n", .{args.file_path.?});
+        return err;
+    };
     return contents;
 }
