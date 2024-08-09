@@ -92,4 +92,34 @@ pub const Lexer = struct {
             .lexeme = self.input[start..self.pos],
         };
     }
+
+    pub fn tokenizeAll(self: *Lexer) ![]Token {
+        var tokens = std.ArrayList(Token).init(std.heap.page_allocator);
+        while (self.pos < self.input.len) {
+            const token = self.tokenizer();
+            if (token.type == TokenType.CONSTANT and token.lexeme.len == 0) {
+                break;
+            }
+
+            try tokens.append(token);
+        }
+
+        return tokens.toOwnedSlice();
+    }
 };
+
+
+pub fn tokenToString(tokenType: TokenType) []const u8 {
+    return switch (tokenType) {
+        .INT_LIT => "INT_LIT",
+        .VOID => "VOID",
+        .RETURN => "RETURN",
+        .IDENTIFIER => "IDENTIFIER",
+        .CONSTANT => "CONSTANT",
+        .OPEN_BRACES => "OPEN_BRACES",
+        .CLOSE_BRACES => "CLOSE_BRACES",
+        .OPEN_PARENTHESIS => "OPEN_PARENTHESIS",
+        .CLOSE_PARENTHESIS => "CLOSE_PARENTHESIS",
+        .SEMICOLON => "SEMICOLON"
+    };
+}
