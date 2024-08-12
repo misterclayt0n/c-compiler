@@ -6,6 +6,8 @@ const TokenType = @import("token/token.zig").TokenType;
 const tokenToString = @import("token/token.zig").tokenToString;
 const Parser = @import("parser/parser.zig").Parser;
 const printProgram = @import("parser/parser.zig").printProgram;
+const printAssembly = @import("assembly/asm.zig").printAssemblyProgram;
+const generateAssembly = @import("assembly/asm.zig").generateAssembly;
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
@@ -21,5 +23,6 @@ pub fn main() !void {
     var parser = Parser.init(tokens);
     const program = try parser.parseProgram();
 
-    printProgram(program);
+    const assemblyProgram = try generateAssembly(program);
+    printAssembly(assemblyProgram);
 }

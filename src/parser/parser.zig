@@ -43,7 +43,7 @@ pub const Parser = struct {
     fn parseFunction(self: *Parser) !Function {
         _ = try self.expect(.INT_LIT); // expect "int"
         const name_token = try self.expect(.IDENTIFIER); // expect the name of the function
-        const name = name_token.lexeme; // agora podemos acessar lexeme de name_token
+        const name = name_token.lexeme;
         _ = try self.expect(.OPEN_PARENTHESIS); // wait "("
         _ = try self.expect(.VOID); // wait "void"
         _ = try self.expect(.CLOSE_PARENTHESIS); // wait ")"
@@ -101,7 +101,7 @@ fn printConstant(constant: Constant) void {
     std.debug.print("      Constant({d})\n", .{constant.value});
 }
 
-const Program = struct {
+pub const Program = struct {
     function: Function,
 };
 
